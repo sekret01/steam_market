@@ -1,31 +1,87 @@
-from __future__ import annotations
 from requests import Session
-from ._url_bilder import UrlBuilder
+from .inventory_manager import InventoryManager
 
 
 class Inventory:
     """
-    Объект для взаимодействия с инвентарем пользователя
+    Хранение предметов в инвентаре, предметов на продажу
+    и их обновление
     """
-    def __init__(self, steam_id: int) -> None:
-        self.inventory_url_base: str = f"https://steamcommunity.com/inventory/{steam_id}/"  # /app_id
-        self.sells_list_url_base: str = "https://steamcommunity.com/market/mylistings"
-        self.suffix_steam_inventory: str = "753/6?l=russian"  # &count=1000
-        self.suffix_app_inventory: str = "2?l=russian"
 
-    def get_app_items(self, session: Session, app_id: int = 753) -> dict:
-        """ Получения имеющихся предметов для приложения """
-        builder = UrlBuilder(self.inventory_url_base, injson=False)
-        builder.add_root(app_id)
-        builder.add_root(6) if app_id == 753 else builder.add_root(2)
-        builder.add_parameters({'l': 'russian'})
-        url = builder.get_url()
-        resp = session.get(url=url).json()
-        return resp
+    def __init__(self, session: Session, steam_id: int, monitoring_apps: list[int]):
+        self.session: Session = session
+        self.inv_m = InventoryManager(steam_id)
+        self.steam_id: int = steam_id
+        self.items: dict = {}
+        self.sell_list: dict = {}
+        self.buy_list: dict = {}
 
-    def get_selling_items(self, session: Session, app_id: int | None = None) -> dict:
-        """ Получение информации о лотах продажи """
-        builder = UrlBuilder(self.sells_list_url_base)
-        resp = session.get(builder.get_url()).json()  # ['success', 'pagesize', 'total_count', 'assets', 'start', 'num_active_listings', 'listings', 'listings_on_hold', 'listings_to_confirm', 'buy_orders']
-        # print(resp.keys())
-        return resp
+        for app in monitoring_apps:
+            self.update_items(app)
+
+    def update_items(self, app_id: int, get_change: bool = False) -> dict | None:
+        resp_data = self.inv_m.get_app_items(session=self.session, app_id=app_id)
+        if resp_data is None: return
+        items_data: list[dict] = resp_data.get('assets')
+        items_descriptions: list[dict] = resp_data.get('descriptions')
+        if items_data is None: return
+        res_data = {}
+        res_description = {}
+        return_data = None
+
+        for item in items_descriptions:
+            res_description[item['classid']] = item['name']
+
+        for item_d in items_data:
+            res_data[item_d['assetid']] = {'assetid': item_d['assetid'], 'classid': item_d['classid'], 'name': res_description[item_d['classid']]}
+
+        old_data: dict | None = self.items.setdefault(app_id)
+        if get_change:
+            return_data = {}
+            if old_data is None: return_data = res_data
+            else:
+                for asset_id in res_data.keys():
+                    if asset_id not in old_data.keys():
+                        return_data[asset_id] = res_data[asset_id]
+        self.items[app_id] = res_data
+        return return_data
+
+    def update_sells(self, get_change: bool = False) -> dict | None:
+        resp_data = self.inv_m.get_selling_items(self.session)
+        if (sell_list := resp_data.get('assets')) is None: return
+
+        return_data = None
+        res_data = {}
+        for app in sell_list.keys():
+            app_data = sell_list[app].get('2')
+            for key, val in app_data.items():
+                res_data[key] = {'id': val['id'], 'appid': val['appid'], 'classid': val['classid'], 'name': val['name']}
+
+        if get_change:
+            old_data = self.sell_list
+            return_data = {}
+            for itemid in old_data.keys():
+                if itemid not in res_data.keys():
+                    return_data[itemid] = old_data[itemid]
+        self.sell_list = res_data
+        return return_data
+
+    def update_buys(self, get_change: bool = False):
+        resp_data = self.inv_m.get_selling_items(self.session)
+        if (buy_list := resp_data.get('buy_orders')) is None: return
+
+        return_data = None
+        res_data = {}
+        for el in buy_list:
+            res_data[el.get('buy_orderid')] = {'buy_orderid': el['buy_orderid'], 'appid': el['appid'],
+                                               'name': el['hash_name'], 'price': el['price'], 'quantity': el['quantity']}
+        if get_change:
+            old_data = self.buy_list
+            return_data = {}
+            for orderid in old_data.keys():
+                if orderid not in res_data.keys():
+                    return_data[orderid] = old_data[orderid]
+        self.buy_list = res_data
+        return return_data
+
+
