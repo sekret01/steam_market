@@ -1,4 +1,4 @@
-import time
+# import time
 import datetime
 
 class Order:
@@ -29,8 +29,3 @@ class Order:
         days = res.days
         sec = res.seconds
         return {"days": days, "seconds": sec}
-
-
-o = Order(1,1,1,1,1,'asd')
-time.sleep(10)
-o.wait_time()
