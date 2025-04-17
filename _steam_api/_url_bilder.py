@@ -17,7 +17,7 @@ class UrlBuilder:
     def fit(self, url_base: str, injson: bool):
         self.url = url_base + '?'
         if injson:
-            self.url += "?norender=1"
+            self.url += "norender=1"
 
     def get_url(self) -> str:
         return self.url
