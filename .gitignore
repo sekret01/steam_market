@@ -1,0 +1,10 @@
+.venv 
+.idea 
+.mypy_cache 
+*__pycache__* 
+all_steam_games.db 
+configs 
+*.json
+testing.py
+tests.py
+main.py
