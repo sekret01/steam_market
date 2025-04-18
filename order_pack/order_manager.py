@@ -18,6 +18,11 @@ class OrderManager:
     def apps(self) -> list[int]:
         return list(self.stack_hub.keys())
 
+    def free_count_in_stack(self, app_id: int) -> int:
+        if not app_id in self.stack_hub.keys():
+            self._add_stack(app_id)
+        return self.stack_hub[app_id].free_count
+
     def orders_on_app(self, app_id: int) -> list[int]:
         return self.stack_hub[app_id].orders_list
 

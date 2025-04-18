@@ -58,9 +58,9 @@ class SetsSession(requests.Session):
                     continue
                 data[s_part[0].strip()] = s_part[1].strip()
 
-        except Exception as ex:
-            print('upd head 2\n', ex)
-            return
+        # except Exception as ex:
+        #     print('upd head 2\n', ex)
+        #     return
 
         try:
             self.cookies.update(data)
@@ -78,7 +78,7 @@ class SetsSession(requests.Session):
 
 
     def save_cookies(self, file_name: str):
-        with open(file_name, 'r', encoding='utf-8') as f:
+        with open(file_name, 'w', encoding='utf-8') as f:
             json.dump(dict(self.cookies), f)
 
 
@@ -121,4 +121,3 @@ class SetsSession(requests.Session):
             print("big error")
             return
         self.headers.update()
-

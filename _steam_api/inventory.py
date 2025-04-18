@@ -6,6 +6,17 @@ class Inventory:
     """
     Хранение предметов в инвентаре, предметов на продажу
     и их обновление
+
+    Хранение предметов осуществляется в следующем формате
+
+    *items*
+        {appid: {assetid: {assetid, classid, name}}}
+
+    *sell_items*
+        {id: {id, appid, classid, name}}
+
+    *buy_items*
+        {buy_orderid: buy_orderid, appid, name, price, quantity, quantity_remaining}
     """
 
     def __init__(self, session: Session, steam_id: int, monitoring_apps: list[int]):
@@ -18,6 +29,8 @@ class Inventory:
 
         for app in monitoring_apps:
             self.update_items(app)
+        self.update_sells()
+        self.update_buys()
 
     def update_items(self, app_id: int, get_change: bool = False) -> dict | None:
         resp_data = self.inv_m.get_app_items(session=self.session, app_id=app_id)
@@ -74,13 +87,14 @@ class Inventory:
         res_data = {}
         for el in buy_list:
             res_data[el.get('buy_orderid')] = {'buy_orderid': el['buy_orderid'], 'appid': el['appid'],
-                                               'name': el['hash_name'], 'price': el['price'], 'quantity': el['quantity']}
+                                               'name': el['hash_name'], 'price': el['price'],
+                                               'quantity': el['quantity'], 'quantity_remaining': el['quantity_remaining']}
         if get_change:
             old_data = self.buy_list
             return_data = {}
-            for orderid in old_data.keys():
-                if orderid not in res_data.keys():
-                    return_data[orderid] = old_data[orderid]
+            for orderid in res_data.keys():
+                if orderid not in old_data.keys():
+                    return_data[orderid] = res_data[orderid]
         self.buy_list = res_data
         return return_data
 
