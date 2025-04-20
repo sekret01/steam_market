@@ -44,4 +44,9 @@ class OrderManager:
         if app_id not in self.stack_hub: return
         self.stack_hub[app_id].remove(order)
         if self.stack_hub[app_id].size_now == 0:
-            self.stack_hub.pop(app_id)
+            ...
+            # self.stack_hub.pop(app_id)
+
+    def search_order(self, app_id: int, name: str) -> Order | None:
+        return self.stack_hub[app_id].search_order(name)
+

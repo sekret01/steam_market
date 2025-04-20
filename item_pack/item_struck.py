@@ -8,12 +8,19 @@ class Item:
             app_id: int,
             asset_id: int,
             name: str,
-            buy_price: int
+            buy_price: int,
+            sell_price: int
     ):
         self.app_id = app_id
         self.asset_id = asset_id
         self.name = name
         self.buy_price = buy_price
+        self.sell_price = sell_price
+        self.on_selling = False
 
     def __repr__(self) -> str:
         return f"Item {self.asset_id} [app:{self.app_id} name:{self.name}]"
+
+    def set_selling(self):
+        self.on_selling = True
+

@@ -1,4 +1,4 @@
-from item_struck import Item
+from .item_struck import Item
 
 
 class ItemStack:
@@ -6,7 +6,7 @@ class ItemStack:
     def __init__(self, app_id: int) -> None:
         self.app_id = app_id
         self._stack: list[Item] = []
-        self._limit: int = 10
+        self._limit: int = 4
         self._count: int = 0
 
     def set_limit(self, new_limit) -> None:
@@ -20,6 +20,20 @@ class ItemStack:
     def remove(self, item: Item) -> None:
         if item in self._stack:
             self._stack.remove(item)
+            self._count -= 1
+
+    def search_item(self, app_id: int, name: str) -> Item | None:
+        for item in self._stack:
+            if item.name == name and item.app_id == app_id:
+                return item
+        return None
+
+    def search_item_by_assetid(self, assetid: int) -> Item | None:
+        for item in self._stack:
+            if item.asset_id == assetid:
+                return item
+        return None
+
 
     @property
     def free_count(self) -> int:
@@ -36,3 +50,4 @@ class ItemStack:
     @property
     def size_now(self):
         return self._count
+

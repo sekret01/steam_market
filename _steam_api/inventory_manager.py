@@ -18,7 +18,7 @@ class InventoryManager:
         builder = UrlBuilder(self.inventory_url_base, injson=False)
         builder.add_root(app_id)
         builder.add_root(6) if app_id == 753 else builder.add_root(2)
-        builder.add_parameters({'l': 'russian'})
+        builder.add_parameters({'l': 'english'})
         url = builder.get_url()
         resp = session.get(url=url).json()
         return resp
@@ -26,6 +26,7 @@ class InventoryManager:
     def get_selling_items(self, session: Session, app_id: int | None = None) -> dict:
         """ Получение информации о лотах продажи """
         builder = UrlBuilder(self.sells_list_url_base)
+        builder.add_parameters({'l': 'english'})
         resp = session.get(builder.get_url()).json()  # ['success', 'pagesize', 'total_count', 'assets', 'start', 'num_active_listings', 'listings', 'listings_on_hold', 'listings_to_confirm', 'buy_orders']
         # print(resp.keys())
         return resp

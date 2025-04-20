@@ -33,7 +33,6 @@ class BuyMarket(BaseMarket):
     Создание лота продажи предмета
     
     :param session: (int) - request-сессия, от которой происходит запрос
-    :param steam_id: (int) - id профиля steam
     :param app_id: (int) - id приложения
     :param item_name: (str) - название предмета
     :param price_for_one: (int) - цена одного предмета на продажу

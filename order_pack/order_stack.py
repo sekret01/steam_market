@@ -7,7 +7,7 @@ class OrderStack:
     def __init__(self, app_id: int):
         self.app_id = app_id
         self._stack: list[Order] = []
-        self._limit: int = 10
+        self._limit: int = 2
         self._count: int = 0
         self._booked: int = 0
 
@@ -28,6 +28,12 @@ class OrderStack:
         self._stack.remove(order)
         self._count -= 1
         self._booked -= 1
+
+    def search_order(self, name: str) -> Order | None:
+        for order in self._stack:
+            if order.name == name:
+                return order
+        return None
 
     @property
     def size_now(self) -> int:
