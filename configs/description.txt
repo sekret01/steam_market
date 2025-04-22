@@ -1,0 +1,15 @@
+Создать файл steam_config.py и __init__.py
+
+Содержимое:
+
+steam_config.py:
+
+APIKEY: str = "..."
+STEAMID: int = ...
+LOGIN: str = "..."
+PASSWORD: str = "..."
+
+
+__init__.py:
+
+from .steam_configs import APIKEY, STEAMID, LOGIN, PASSWORD
