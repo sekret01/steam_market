@@ -12,13 +12,13 @@ def sell_items():
 
 
     app_id = 440
-    name = "Winter 2024 Cosmetic Case"
+    name = "Scream Fortress XVI War Paint Case"
 
     seller = SellMarket()
     data = Inventory(SESSION, STEAMID, [app_id]).items[app_id]
     for key, val in data.items():
         if val['name'] == name:
-            seller.sell_item(SESSION, STEAMID, app_id, val['assetid'], price_for_one=5, amount=1)
+            seller.sell_item(SESSION, STEAMID, app_id, val['assetid'], price_for_one=10, amount=1)
 
 
 if __name__ == "__main__":

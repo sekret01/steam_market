@@ -8,12 +8,14 @@ class ItemManager:
     Класс, управляющий стеками предметов,
     добавлением и удалением новых стеков и предметов
     """
-    def __init__(self, session: Session):
+    def __init__(self, session: Session, steck_limit: int = 10):
         self.item_hub: dict[int, ItemStack] = {}
         self.session: Session = session
+        self.steck_limit: int = steck_limit
 
     def _add_stack(self, app_id) -> None:
         self.item_hub[app_id] = ItemStack(app_id)
+        self.item_hub[app_id].set_limit(self.steck_limit)
 
     def add_item(self, item: Item):
         if item.app_id not in self.item_hub.keys():

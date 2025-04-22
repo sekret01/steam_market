@@ -6,7 +6,7 @@ class ItemStack:
     def __init__(self, app_id: int) -> None:
         self.app_id = app_id
         self._stack: list[Item] = []
-        self._limit: int = 4
+        self._limit: int = 2
         self._count: int = 0
 
     def set_limit(self, new_limit) -> None:

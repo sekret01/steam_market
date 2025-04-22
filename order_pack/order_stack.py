@@ -7,7 +7,7 @@ class OrderStack:
     def __init__(self, app_id: int):
         self.app_id = app_id
         self._stack: list[Order] = []
-        self._limit: int = 2
+        self._limit: int = 1
         self._count: int = 0
         self._booked: int = 0
 

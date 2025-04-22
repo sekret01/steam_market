@@ -61,37 +61,64 @@ class Inventory:
 
     def update_sells(self, get_change: bool = False) -> dict | None:
         resp_data = self.inv_m.get_selling_items(self.session)
+        return_data = None
         res_data = {}
 
+        # обработка списка продаваемых
         if not (sell_list := resp_data.get('assets')) is None:
             for app in sell_list.keys():
                 app_data = sell_list[app].get('2')
                 for key, val in app_data.items():
-                    if get_change:
-                        if int(key) not in self.sell_list.keys():
-                            res_data[int(key)] = {'id': int(val['id']), 'appid': int(val['appid']), 'classid': int(val['classid']), 'name': val['name']}
-                    else: res_data[int(key)] = {'id': int(val['id']), 'appid': int(val['appid']), 'classid': int(val['classid']), 'name': val['name']}
+                    res_data[int(key)] = {'id': int(val['id']), 'appid': int(val['appid']),
+                                          'classid': int(val['classid']), 'name': val['name']}
 
+        # обработка списка ожидающих подтверждения
         if not (confirm_list := resp_data.get('listings_to_confirm')) is None:
             for d_data in confirm_list:
                 asset = d_data['asset']
-                if get_change:
-                    if int(asset['id']) not in self.sell_list.keys():
-                        res_data[int(asset['id'])] = {'id': int(asset['id']), 'appid': int(asset['appid']), 'classid': int(asset['classid']), 'name': asset['name']}
-                else: res_data[int(asset['id'])] = {'id': int(asset['id']), 'appid': int(asset['appid']), 'classid': int(asset['classid']), 'name': asset['name']}
+                res_data[int(asset['id'])] = {'id': int(asset['id']), 'appid': int(asset['appid']),
+                                              'classid': int(asset['classid']), 'name': asset['name']}
 
-        # мб убрать из-за ненадобности
-        # if get_change:
-        #     old_data = self.sell_list
-        #     return_data = {}
-        #     for itemid in old_data.keys():
-        #         if itemid not in res_data.keys():
-        #             return_data[itemid] = old_data[itemid]
-        if not get_change:
-            self.sell_list = res_data
+        if get_change:
+            return_data = {}
+            for key, value in self.sell_list.items():
+                if key not in res_data.keys():
+                    return_data[key] = value
 
-        # self.sell_list = res_data
-        return res_data
+        self.sell_list = res_data
+        return return_data
+
+        # res_data = {}
+        #
+        # if not (sell_list := resp_data.get('assets')) is None:
+        #     for app in sell_list.keys():
+        #         app_data = sell_list[app].get('2')
+        #         for key, val in app_data.items():
+        #             if get_change:
+        #                 if int(key) not in self.sell_list.keys():
+        #                     res_data[int(key)] = {'id': int(val['id']), 'appid': int(val['appid']), 'classid': int(val['classid']), 'name': val['name']}
+        #             else: res_data[int(key)] = {'id': int(val['id']), 'appid': int(val['appid']), 'classid': int(val['classid']), 'name': val['name']}
+        #
+        # if not (confirm_list := resp_data.get('listings_to_confirm')) is None:
+        #     for d_data in confirm_list:
+        #         asset = d_data['asset']
+        #         if get_change:
+        #             if int(asset['id']) not in self.sell_list.keys():
+        #                 res_data[int(asset['id'])] = {'id': int(asset['id']), 'appid': int(asset['appid']), 'classid': int(asset['classid']), 'name': asset['name']}
+        #         else: res_data[int(asset['id'])] = {'id': int(asset['id']), 'appid': int(asset['appid']), 'classid': int(asset['classid']), 'name': asset['name']}
+        #
+        # # мб убрать из-за ненадобности
+        # # if get_change:
+        # #     old_data = self.sell_list
+        # #     return_data = {}
+        # #     for itemid in old_data.keys():
+        # #         if itemid not in res_data.keys():
+        # #             return_data[itemid] = old_data[itemid]
+        # if not get_change:
+        #     self.sell_list = res_data
+        #
+        # # self.sell_list = res_data
+        # return res_data
 
     def update_buys(self, get_change: bool = False):
         resp_data = self.inv_m.get_selling_items(self.session)

@@ -7,12 +7,14 @@ from .order_struct import Order
 class OrderManager:
     """ Класс, управляющий заполнение стека товаров """
 
-    def __init__(self, session: Session) -> None:
+    def __init__(self, session: Session, steck_limit: int = 5) -> None:
         self.stack_hub: dict[int, OrderStack] = {}
         self.session: Session = session
+        self.steck_limit: int = steck_limit
 
     def _add_stack(self, app_id: int) -> None:
         self.stack_hub[app_id] = OrderStack(app_id)
+        self.stack_hub[app_id].set_limit(self.steck_limit)
 
     @property
     def apps(self) -> list[int]:
