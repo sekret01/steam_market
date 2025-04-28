@@ -13,7 +13,7 @@ import datetime
 
 SAVE_PATH_COOKIES = "saved_data/cookies.json"
 MONITOR_APPS = [apps.TeamFortress]
-BUY_PRICE = 10
+BUY_PRICE = 9
 SELL_PRICE = 10
 ORDER_LIMIT = 5
 INVENTORY_LIMIT = 10
@@ -54,9 +54,11 @@ def main(session: SetsSession):
 
                     seller.sell_item(session=session, steam_id=STEAMID, app_id=app, asset_id=item.asset_id, price_for_one=SELL_PRICE, amount=1)
                     item.set_selling()
+                    time.sleep(1)
                     # print(f"предмет {item} выставлен на продажу")
 
                 # print(f"предметы были добавлены")
+                time.sleep(3)
 
 
 
@@ -76,7 +78,7 @@ def main(session: SetsSession):
 
                 resp = buyer.buy_item(session=session, app_id=app, item_name=_item_name, price_for_one=BUY_PRICE, quantity=rez_size) # W
                 blocker.set_amount(item_name=_item_name, amount=rez_size)
-                print('[{str_time_now()}] \033[37m[book stack]\033[0m success:', resp['success'])
+                print(f'[{str_time_now()}] \033[37m[book stack]\033[0m success:', resp['success'])
                 if resp['success'] == 1:
                     order_id = resp['buy_orderid']
                     print(f"[{str_time_now()}] \033[37m[book stack]\033[0m ID заказа: {order_id} -> ID игры:{app} количество:{rez_size}")
@@ -87,6 +89,8 @@ def main(session: SetsSession):
                     print(f"[{str_time_now()}] \033[37m[book stack]\033[0m " + resp['message'])
                     print(f'[{str_time_now()}] \033[37m[book stack]\033[0m отмена брони')
                     order_manager.book_order(app, -rez_size)
+
+            time.sleep(3)
 
 
         # блок для обработки новых заказов
@@ -101,6 +105,8 @@ def main(session: SetsSession):
                                   name=val['name'])
                     order_manager.add_order(order)
                     print(f"[{str_time_now()}] \033[36m[new order]\033[0m заказ [ID игры:{val['appid']} цена:{round(int(val['price']) / 100, 2)} предмет:{val['name']}]")
+
+        time.sleep(3)
 
         # блок обработки проданных предметов
         selling_items = inventory.update_sells(get_change=True)
@@ -129,7 +135,7 @@ def main(session: SetsSession):
         #
         # print('-'*30)
 
-        time.sleep(5)
+        time.sleep(10)
 
         # необходимо создать стек для предметов (ItemStack) и управляющий им элемент
         # при заполнении стека ItemStack новые продажи не будут осуществляться -> новые заказы не будут оформляться
